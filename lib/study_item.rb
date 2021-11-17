@@ -42,14 +42,6 @@ class StudyItem
     self
   end
 
-  def self.find_by_title(title)
-    db = SQLite3::Database.open "db/database.db"
-    db.results_as_hash = true
-    itens = db.execute "SELECT title, category FROM diario where title='#{title}'"
-    db.close
-    itens.map {|item| new(title: item['title'], category: item['category']) }
-  end
-
   def self.find_by_category(categoria)
     system "clear"
     puts "Os itens na categoria #{categoria} são: "
@@ -69,7 +61,6 @@ class StudyItem
     itens = db.execute "SELECT title, category, description FROM diario where done='0'"
     db.close
     lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
-    #lista.each{|valor| puts " - #{valor.title} - #{valor.description}"}
   end
 
   def self.find_done()
@@ -80,7 +71,6 @@ class StudyItem
     itens = db.execute "SELECT title, category, description FROM diario where done='1'"
     db.close
     lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
-    lista.each{|valor| puts " - #{valor.title} - #{valor.description}"}
   end
 
   def self.delete(title)
@@ -95,5 +85,10 @@ class StudyItem
     db.close
   end
 
+  def self.undone(title)
+    db = SQLite3::Database.open "db/database.db"
+    db.execute "UPDATE diario SET done='0' WHERE title='#{ title }'"
+    db.close
+  end
 
 end

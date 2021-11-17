@@ -3,18 +3,24 @@ LISTAR = 2
 BUSCAR = 3
 REMOVER = 4
 CONCLUIR = 5
+POR_CATEGORIA = 6
+CONCLUIDOS = 7
+UNDONE = 8
 SAIR = 9
 require_relative 'study_item'
 
 def menu()
-  puts "[#{CADASTRAR}] Cadastrar um item para estudar"
-  puts "[#{LISTAR}] Ver todos os itens cadastrados"
-  puts "[#{BUSCAR}] Buscar um item de estudo"
-  puts "[#{REMOVER}] Remover item"
-  puts "[#{CONCLUIR}] Concluir item"
-  puts "[6] Listar por categoria"
-  puts "[7] Ver os itens concluídos"
-  puts "[#{SAIR}] Sair"
+  puts "//============================================//"
+  puts "|| [#{CADASTRAR}] Cadastrar um item para estudar         ||"
+  puts "|| [#{LISTAR}] Ver todos os itens cadastrados         ||"
+  puts "|| [#{BUSCAR}] Buscar um item de estudo               ||"
+  puts "|| [#{REMOVER}] Remover item                           ||"
+  puts "|| [#{CONCLUIR}] Concluir item                          ||"
+  puts "|| [#{POR_CATEGORIA}] Listar por categoria                   ||"
+  puts "|| [#{CONCLUIDOS}] Ver os itens concluídos                ||"
+  puts "|| [#{UNDONE}] Voltar a estudar                       ||"
+  puts "|| [#{SAIR}] Sair                                   ||"
+  puts "//============================================// "
   print "Escolha uma opção: "
   gets.to_i
 end
@@ -22,6 +28,12 @@ end
 def listar_itens()
   puts "Lista de itens cadastrados: "
   estudos = StudyItem.find_undone
+  estudos.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
+end
+
+def listar_concluidos()
+  puts "Lista de itens concluídos: "
+  estudos = StudyItem.find_done
   estudos.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
 end
 
@@ -73,7 +85,7 @@ while opcao != SAIR
     busca = gets.chomp
     estudos = StudyItem.all
     estudos.map do |valor|
-       if (valor.title.include? busca) || (valor.description.include? busca)
+       if (valor.title.include? "/#{busca}/i" ) || (valor.description.include? "/#{busca}/i")
          puts " - #{valor.title} - #{valor.description} - Categoria #{valor.category}"
        end
      end
@@ -97,13 +109,22 @@ while opcao != SAIR
     puts "item concluído com sucesso"
     gets
 
-  when 6
+  when POR_CATEGORIA
     categoria = selecionar_categoria()
     StudyItem.find_by_category(categoria)
     gets
 
-  when 7
-    StudyItem.find_done()
+  when CONCLUIDOS
+    listar_concluidos()
+    gets
+
+  when UNDONE
+    lista = listar_concluidos()
+    print "Qual o item que deseja voltar a estudar: "
+    selecao = gets.to_i
+    selecao = lista[(selecao - 1)].title
+    StudyItem.undone(selecao)
+    puts "item retornou com sucesso"
     gets
 
   when SAIR
