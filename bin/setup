@@ -12,16 +12,18 @@ begin
   db.execute <<~SQL
     CREATE TABLE Diario(
       title varchar(255),
-      category varchar(255)
+      category varchar(255),
+      description varchar(255),
+      done bool
     );
   SQL
 
-  seed_data = [["Laços de repetição", "Ruby"],
-               ["DB", "Rails"],
-               ["Scripts", "HTML"]]
+  seed_data = [["Laços de repetição", "Ruby", "Como utilizar os laços de repetição", 0],
+               ["DB", "Rails", "Criando tabelas no BD", 0],
+               ["Scripts", "HTML", "Criar scripts", 0]]
 
   seed_data.each do |data|
-    db.execute "INSERT INTO Diario VALUES ( ?, ? )", data
+    db.execute "INSERT INTO Diario VALUES ( ?, ?, ?, ? )", data
   end
 
 rescue SQLite3::Exception => e
