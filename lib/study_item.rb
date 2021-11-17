@@ -49,7 +49,7 @@ class StudyItem
     db.results_as_hash = true
     itens = db.execute "SELECT title, category, description FROM diario where category='#{categoria}'"
     db.close
-    lista = itens.map {|item| new(title: item['title'], category: item['category']) }
+    lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
     lista.each{|valor| puts " - #{valor.title} - #{valor.description}"}
   end
 
