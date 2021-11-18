@@ -49,10 +49,17 @@ def selecionar_categoria()
     categoria = "Ruby"
   elsif categoria == 2
     categoria = "Rails"
-  else
+  elsif categoria == 3
     categoria = "HTML"
   end
   categoria
+end
+
+def fim_de_funcao()
+  puts "---------------------------"
+  puts "Aperte ENTER para continuar"
+  gets
+  system "clear"
 end
 
 opcao = 0
@@ -64,7 +71,6 @@ while opcao != SAIR
   system "clear"
   case opcao
   when CADASTRAR
-    system "clear"
     print "Digite o item para estudo: ".yellow
     item = gets.chomp().capitalize
     categoria = selecionar_categoria()
@@ -74,68 +80,68 @@ while opcao != SAIR
     estudos.save_to_db
     opcao = 0
     puts "Item #{item} cadastrado com sucesso na categoria #{categoria}"
-    gets
-    system "clear"
+    fim_de_funcao()
 
   when LISTAR
-    system "clear"
     listar_itens()
-    gets
-    system "clear"
+    fim_de_funcao()
 
   when BUSCAR
-    system "clear"
     print "Qual item deseja encontrar: ".yellow
     busca = gets.chomp
     estudos = StudyItem.all
+    puts "Itens encontrados: "
     estudos.each do |valor|
       if ( valor.title.include? busca ) || ( valor.description.include? busca )
         puts " - #{valor.title} - #{valor.description} - Categoria #{valor.category}"
       end
     end
-    gets
-    system "clear"
+    fim_de_funcao()
 
   when REMOVER
     lista = listar_itens()
     print "Qual o item que deseja remover: ".yellow
-    selecao = gets.to_i
-    selecao = lista[(selecao - 1)].title
-    StudyItem.delete(selecao)
-    puts "item removido com sucesso"
-    gets
-    system "clear"
+    selecao = gets.chomp
+    if !selecao.empty?
+      selecao = selecao.to_i
+      selecao = lista[(selecao - 1)].title
+      StudyItem.delete(selecao)
+      puts "item removido com sucesso"
+    end
+    fim_de_funcao()
 
   when CONCLUIR
     lista = listar_itens()
     print "Qual o item que deseja concluir: ".yellow
-    selecao = gets.to_i
-    selecao = lista[(selecao - 1)].title
-    StudyItem.done(selecao)
-    puts "item concluído com sucesso"
-    gets
-    system "clear"
+    selecao = gets.chomp
+    if !selecao.empty?
+      selecao = selecao.to_i
+      selecao = lista[(selecao - 1)].title
+      StudyItem.done(selecao)
+      puts "item concluído com sucesso"
+    end
+    fim_de_funcao()
 
   when POR_CATEGORIA
     categoria = selecionar_categoria()
     StudyItem.find_by_category(categoria)
-    gets
-    system "clear"
+    fim_de_funcao()
 
   when CONCLUIDOS
     listar_concluidos()
-    gets
-    system "clear"
+    fim_de_funcao()
 
   when UNDONE
     lista = listar_concluidos()
     print "Qual o item que deseja voltar a estudar: ".yellow
-    selecao = gets.to_i
-    selecao = lista[(selecao - 1)].title
-    StudyItem.undone(selecao)
-    puts "item retornou com sucesso"
-    gets
-    system "clear"
+    selecao = gets.chomp
+    if !selecao.empty?
+      selecao = selecao.to_i
+      selecao = lista[(selecao - 1)].title
+      StudyItem.undone(selecao)
+      puts "item retornou para estudo com sucesso"
+    end
+    fim_de_funcao()
 
   when SAIR
     system "clear"

@@ -4,7 +4,7 @@ require_relative 'category'
 class StudyItem
   attr_accessor :title, :category, :description, :done
 
-  def initialize ( title:, category: Category.new, description: "Não preenchido" )
+  def initialize ( title:, category: Category.new, description: "Não preenchido", done: '0' )
     @title = title
     @category = category
     @description = description
@@ -30,7 +30,7 @@ class StudyItem
   def self.all
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
-    itens = db.execute "SELECT title, category, description FROM diario"
+    itens = db.execute "SELECT title, category, description, done FROM diario WHERE done='0'"
     db.close
     itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
   end
