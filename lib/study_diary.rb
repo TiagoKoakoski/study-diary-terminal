@@ -1,58 +1,121 @@
-CADASTRAR = 1
-LISTAR = 2
-BUSCAR = 3
-REMOVER = 4
-CONCLUIR = 5
-POR_CATEGORIA = 6
-CONCLUIDOS = 7
+INSERT = 1
+VIEW = 2
+SEARCH = 3
+DELETE = 4
+DONE = 5
+LIST_CATEGORY = 6
+LIST_DONE = 7
 UNDONE = 8
-SAIR = 9
+EXIT = 9
 require_relative 'study_item'
 require 'colorize'
 
-def menu()
-  puts "//============================================//"
-  puts "|| [#{CADASTRAR}] Cadastrar um item para estudar         ||"
-  puts "|| [#{LISTAR}] Ver todos os itens cadastrados         ||"
-  puts "|| [#{BUSCAR}] Buscar um item de estudo               ||"
-  puts "|| [#{REMOVER}] Remover item                           ||"
-  puts "|| [#{CONCLUIR}] Concluir item                          ||"
-  puts "|| [#{POR_CATEGORIA}] Listar por categoria                   ||"
-  puts "|| [#{CONCLUIDOS}] Ver os itens concluídos                ||"
-  puts "|| [#{UNDONE}] Voltar a estudar                       ||"
-  puts "|| [#{SAIR}] Sair                                   ||"
-  puts "//============================================// "
+def menu
+  puts <<~MENU
+  //============================================//
+  || [#{INSERT}] Cadastrar um item para estudar         ||
+  || [#{VIEW}] Ver todos os itens cadastrados         ||
+  || [#{SEARCH}] Buscar um item de estudo               ||
+  || [#{DELETE}] Remover item                           ||
+  || [#{DONE}] Concluir item                          ||
+  || [#{LIST_CATEGORY}] Listar por categoria                   ||
+  || [#{LIST_DONE}] Ver os itens concluídos                ||
+  || [#{UNDONE}] Voltar a estudar                       ||
+  || [#{EXIT}] Sair                                   ||
+  //============================================//
+  MENU
   print "Escolha uma opção: ".yellow
   gets.to_i
 end
 
-def listar_itens()
-  puts "Lista de itens cadastrados: "
-  estudos = StudyItem.find_undone
-  estudos.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
-end
-
-def listar_concluidos()
-  puts "Lista de itens concluídos: "
-  estudos = StudyItem.find_done
-  estudos.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
-end
-
-def selecionar_categoria()
+def select_category()
   puts "Qual a categoria:
   1 - Ruby
   2 - Rails
   3 - HTML"
   print "Categoria: ".yellow
-  categoria = gets.to_i()
-  if categoria == 1
-    categoria = "Ruby"
-  elsif categoria == 2
-    categoria = "Rails"
-  elsif categoria == 3
-    categoria = "HTML"
+  category = gets.to_i()
+  if category == 1
+    category = "Ruby"
+  elsif category == 2
+    category = "Rails"
+  elsif category == 3
+    category = "HTML"
   end
-  categoria
+  category
+end
+
+def create_study_item
+  print "Digite o item para estudo: ".yellow
+  item = gets.chomp()
+  category = select_category()
+  print "Digite a descrição do item para estudo: ".yellow
+  description = gets.chomp()
+  study_item = StudyItem.new(title: item, category: category, description: description)
+  study_item.save_to_db
+  option = 0
+  puts "Item #{item} cadastrado com sucesso na categoria #{category}"
+end
+
+
+def list_items()
+  puts "Lista de itens cadastrados: "
+  study_items = StudyItem.find_undone
+  study_items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
+end
+
+def search_item()
+  print "Qual item deseja encontrar: ".yellow
+  search = gets.chomp
+  study_list = StudyItem.all
+  puts "Itens encontrados: "
+  study_list.each do |valor|
+    if ( valor.title.include? search ) || ( valor.description.include? search )
+      puts " - #{valor.title} - #{valor.description} - Categoria #{valor.category}"
+    end
+  end
+end
+
+def delete_item()
+  list = list_items()
+  print "Qual o item que deseja remover: ".yellow
+  select = gets.chomp
+  return if select.empty?
+
+  select = select.to_i
+  select = list[(select - 1)].title
+  StudyItem.delete(select)
+  puts "item removido com sucesso"
+end
+
+def make_done()
+  list = list_items()
+  print "Qual o item que deseja concluir: ".yellow
+  select = gets.chomp
+  return if select.empty?
+
+  select = select.to_i
+  select = list[(select - 1)].title
+  StudyItem.done(select)
+  puts "item concluído com sucesso"
+end
+
+def list_done()
+  puts "Lista de itens concluídos: "
+  study_items = StudyItem.find_done
+  study_items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
+end
+
+def make_undone()
+  list = list_done()
+  print "Qual o item que deseja voltar a estudar: ".yellow
+  select = gets.chomp
+  return if select.empty?
+
+  select = select.to_i
+  select = list[(select - 1)].title
+  StudyItem.undone(select)
+  puts "item retornou para estudo com sucesso"
 end
 
 def fim_de_funcao()
@@ -62,89 +125,52 @@ def fim_de_funcao()
   system "clear"
 end
 
-opcao = 0
+option = 0
 
 puts "Bem-vindo ao Diário de Estudos, seu companheiro de estudos".yellow
 
-while opcao != SAIR
-  opcao = menu()
+while option != EXIT
+  option = menu()
   system "clear"
-  case opcao
-  when CADASTRAR
-    print "Digite o item para estudo: ".yellow
-    item = gets.chomp().capitalize
-    categoria = selecionar_categoria()
-    print "Digite a descrição do item para estudo: ".yellow
-    descricao = gets.chomp().capitalize
-    estudos = StudyItem.new(title: item, category: categoria, description: descricao)
-    estudos.save_to_db
-    opcao = 0
-    puts "Item #{item} cadastrado com sucesso na categoria #{categoria}"
+  case option
+  when INSERT
+    create_study_item()
     fim_de_funcao()
 
-  when LISTAR
-    listar_itens()
+  when VIEW
+    list_items()
     fim_de_funcao()
 
-  when BUSCAR
-    print "Qual item deseja encontrar: ".yellow
-    busca = gets.chomp
-    estudos = StudyItem.all
-    puts "Itens encontrados: "
-    estudos.each do |valor|
-      if ( valor.title.include? busca ) || ( valor.description.include? busca )
-        puts " - #{valor.title} - #{valor.description} - Categoria #{valor.category}"
-      end
-    end
+  when SEARCH
+    search_item()
     fim_de_funcao()
 
-  when REMOVER
-    lista = listar_itens()
-    print "Qual o item que deseja remover: ".yellow
-    selecao = gets.chomp
-    if !selecao.empty?
-      selecao = selecao.to_i
-      selecao = lista[(selecao - 1)].title
-      StudyItem.delete(selecao)
-      puts "item removido com sucesso"
-    end
+  when DELETE
+    delete_item()
     fim_de_funcao()
 
-  when CONCLUIR
-    lista = listar_itens()
-    print "Qual o item que deseja concluir: ".yellow
-    selecao = gets.chomp
-    if !selecao.empty?
-      selecao = selecao.to_i
-      selecao = lista[(selecao - 1)].title
-      StudyItem.done(selecao)
-      puts "item concluído com sucesso"
-    end
+  when DONE
+    make_done()
     fim_de_funcao()
 
-  when POR_CATEGORIA
-    categoria = selecionar_categoria()
+  when LIST_CATEGORY
+    categoria = select_category()
     StudyItem.find_by_category(categoria)
     fim_de_funcao()
 
-  when CONCLUIDOS
-    listar_concluidos()
+  when LIST_DONE
+    list_done()
     fim_de_funcao()
 
   when UNDONE
-    lista = listar_concluidos()
-    print "Qual o item que deseja voltar a estudar: ".yellow
-    selecao = gets.chomp
-    if !selecao.empty?
-      selecao = selecao.to_i
-      selecao = lista[(selecao - 1)].title
-      StudyItem.undone(selecao)
-      puts "item retornou para estudo com sucesso"
-    end
+    make_undone()
     fim_de_funcao()
 
-  when SAIR
+  when EXIT
     system "clear"
     puts "Obrigado por utilizar o Diário de Estudos"
+
+  else
+    puts 'Opção inválida'
   end
 end

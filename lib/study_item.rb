@@ -8,7 +8,7 @@ class StudyItem
     @title = title
     @category = category
     @description = description
-    @done = 0
+    @done = done
   end
 
   def selecionar_categoria()
@@ -47,10 +47,10 @@ class StudyItem
     puts "Os itens na categoria #{categoria} são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
-    itens = db.execute "SELECT title, category, description FROM diario where category='#{categoria}'"
+    itens = db.execute "SELECT title, category, description, done FROM diario where category='#{categoria}'"
     db.close
-    lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
-    lista.each{|valor| puts " - #{valor.title} - #{valor.description}"}
+    lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done: item['done']) }
+    lista.each{|valor| puts " - #{valor.title} - #{valor.description} #{'- Concluído' if valor.done == 1}"}
   end
 
   def self.find_undone()
