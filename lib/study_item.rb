@@ -29,11 +29,13 @@ class StudyItem
   end
 
   def self.all
+    puts "Os itens cadastrados são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
-    itens = db.execute "SELECT title, category, description, done FROM diario WHERE done='0'"
+    items = db.execute "SELECT title, category, description, done FROM diario"
     db.close
-    itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
+    items = items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done:item['done']) }
+    items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
   end
 
   def save_to_db
@@ -73,10 +75,10 @@ class StudyItem
     puts "Os itens na categoria #{category} são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
-    itens = db.execute "SELECT title, category, description, done FROM diario where category='#{category}'"
+    items = db.execute "SELECT title, category, description, done FROM diario where category='#{category}'"
     db.close
-    lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done: item['done']) }
-    lista.each{|valor| puts " - #{valor.title} - #{valor.description} #{'- Concluído' if valor.done == 1}"}
+    list = items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done: item['done']) }
+    list.each{|valor| puts " - #{valor.title} - #{valor.description} #{'- Concluído' if valor.done == 1}"}
   end
 
   def self.find_undone()
@@ -84,9 +86,10 @@ class StudyItem
     puts "Os itens não concluídos são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
-    itens = db.execute "SELECT title, category, description FROM diario where done='0'"
+    items = db.execute "SELECT title, category, description FROM diario where done='0'"
     db.close
-    lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
+    list = items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
+    list.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
   end
 
   def self.find_done()
@@ -94,9 +97,10 @@ class StudyItem
     puts "Os itens concluídos são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
-    itens = db.execute "SELECT title, category, description FROM diario where done='1'"
+    items = db.execute "SELECT title, category, description FROM diario where done='1'"
     db.close
-    lista = itens.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
+    list = items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
+    list.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
   end
 
   def self.delete()

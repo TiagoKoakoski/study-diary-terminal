@@ -28,19 +28,7 @@ def menu
   gets.to_i
 end
 
-def list_items()
-  puts "Lista de itens cadastrados: "
-  study_items = StudyItem.find_undone
-  study_items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
-end
-
-def list_done()
-  puts "Lista de itens concluídos: "
-  study_items = StudyItem.find_done
-  study_items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
-end
-
-def fim_de_funcao()
+def wait_and_clear()
   puts "---------------------------"
   puts "Aperte ENTER para continuar"
   gets
@@ -57,28 +45,28 @@ while option != EXIT
   case option
   when INSERT
     StudyItem.create_study_item()
-    fim_de_funcao()
+    wait_and_clear()
   when VIEW
-    list_items()
-    fim_de_funcao()
+    StudyItem.all()
+    wait_and_clear()
   when SEARCH
     StudyItem.search_item()
-    fim_de_funcao()
+    wait_and_clear()
   when DELETE
     StudyItem.delete()
-    fim_de_funcao()
+    wait_and_clear()
   when DONE
     StudyItem.done()
-    fim_de_funcao()
+    wait_and_clear()
   when LIST_CATEGORY
     StudyItem.find_by_category()
-    fim_de_funcao()
+    wait_and_clear()
   when LIST_DONE
-    list_done()
-    fim_de_funcao()
+    StudyItem.find_done()
+    wait_and_clear()
   when UNDONE
     StudyItem.undone()
-    fim_de_funcao()
+    wait_and_clear()
   when EXIT
     system "clear"
     puts "Obrigado por utilizar o Diário de Estudos"
