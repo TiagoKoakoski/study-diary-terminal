@@ -29,13 +29,16 @@ class StudyItem
   end
 
   def self.all
-    #puts "Os itens cadastrados são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description, done FROM diario"
     db.close
     items = items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done:item['done']) }
-    #items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
+  end
+
+  def self.print_list(items)
+    puts "Os itens cadastrados são: "
+    items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
   end
 
   def save_to_db

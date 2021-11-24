@@ -47,9 +47,7 @@ while option != EXIT
     StudyItem.create_study_item()
     wait_and_clear()
   when VIEW
-    items = StudyItem.all()
-    puts "Os itens cadastrados são: "
-    items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
+    StudyItem.print_list(StudyItem.all)
     wait_and_clear()
   when SEARCH
     StudyItem.search_item()
