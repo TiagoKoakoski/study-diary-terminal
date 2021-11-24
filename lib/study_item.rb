@@ -29,13 +29,13 @@ class StudyItem
   end
 
   def self.all
-    puts "Os itens cadastrados são: "
+    #puts "Os itens cadastrados são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description, done FROM diario"
     db.close
     items = items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done:item['done']) }
-    items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
+    #items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
   end
 
   def save_to_db
@@ -104,7 +104,7 @@ class StudyItem
   end
 
   def self.delete()
-    list = list_items()
+    list = self.all()
     print "Qual o item que deseja remover: ".yellow
     select = gets.chomp
     return if select.empty?
@@ -117,7 +117,7 @@ class StudyItem
   end
 
   def self.done()
-    list = list_items()
+    list = find_undone()
     print "Qual o item que deseja concluir: ".yellow
     select = gets.chomp
     return if select.empty?
@@ -130,7 +130,7 @@ class StudyItem
   end
 
   def self.undone()
-    list = list_done()
+    list = find_done()
     print "Qual o item que deseja voltar a estudar: ".yellow
     select = gets.chomp
     return if select.empty?
