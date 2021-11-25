@@ -33,11 +33,10 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description, done FROM diario"
     db.close
-    items = items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done:item['done']) }
+    items.map! {|item| new(title: item['title'], category: item['category'], description: item['description'], done:item['done']) }
   end
 
   def self.print_list(items)
-    puts "Os itens cadastrados são: "
     items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
   end
 
@@ -50,11 +49,11 @@ class StudyItem
 
   def self.search_item()
     print "Qual item deseja encontrar: ".yellow
-    search = gets.chomp
-    study_list = StudyItem.all
+    search = gets.chomp.downcase
+    study_list = self.all
     puts "Itens encontrados: "
     study_list.each do |valor|
-      if ( valor.title.include? search ) || ( valor.description.include? search )
+      if ( valor.title.downcase.include? search ) || ( valor.description.downcase.include? search )
         puts " - #{valor.title} - #{valor.description} - Categoria #{valor.category}"
       end
     end
@@ -80,8 +79,7 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description, done FROM diario where category='#{category}'"
     db.close
-    list = items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done: item['done']) }
-    list.each{|valor| puts " - #{valor.title} - #{valor.description} #{'- Concluído' if valor.done == 1}"}
+    self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done: item['done']) })
   end
 
   def self.find_undone()
@@ -91,8 +89,7 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description FROM diario where done='0'"
     db.close
-    list = items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
-    list.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
+    self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) })
   end
 
   def self.find_done()
@@ -102,8 +99,7 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description FROM diario where done='1'"
     db.close
-    list = items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) }
-    list.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category}"}
+    self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) })
   end
 
   def self.delete()

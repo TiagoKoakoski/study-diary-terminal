@@ -47,6 +47,7 @@ while option != EXIT
     StudyItem.create_study_item()
     wait_and_clear()
   when VIEW
+    puts "Os itens cadastrados são: "
     StudyItem.print_list(StudyItem.all)
     wait_and_clear()
   when SEARCH
