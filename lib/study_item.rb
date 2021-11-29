@@ -2,13 +2,18 @@ require 'sqlite3'
 require_relative 'category'
 
 class StudyItem
-  attr_accessor :title, :category, :description, :done
+  attr_accessor :id, :title, :category, :description, :done
 
-  def initialize ( title:, category: Category.new, description: "Não preenchido", done: '0' )
+  def initialize ( id: nil, title:, category: Category.new, description: "Não preenchido", done: '0' )
+    @id = id
     @title = title
     @category = category
     @description = description
     @done = done
+  end
+
+  def self.create_from_db(items)
+    items.map { |hash| hash.transform_keys!(&:to_sym)}.map{|item| StudyItem.new(**item)}
   end
 
   def self.all
@@ -16,7 +21,7 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description, done FROM diario"
     db.close
-    items.map! {|item| new(title: item['title'], category: item['category'], description: item['description'], done:item['done']) }
+    create_from_db(items)
   end
 
   def self.print_list(items)
@@ -62,7 +67,7 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description, done FROM diario where category='#{category}'"
     db.close
-    self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done: item['done']) })
+    self.print_list(create_from_db(items))
   end
 
   def self.find_undone
@@ -72,7 +77,7 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description FROM diario where done='0'"
     db.close
-    self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) })
+    self.print_list(create_from_db(items))
   end
 
   def self.find_done
@@ -82,7 +87,7 @@ class StudyItem
     db.results_as_hash = true
     items = db.execute "SELECT title, category, description FROM diario where done='1'"
     db.close
-    self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) })
+    self.print_list(create_from_db(items))
   end
 
   def self.delete
