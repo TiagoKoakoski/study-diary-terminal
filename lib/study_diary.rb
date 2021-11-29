@@ -1,12 +1,13 @@
-INSERT = 1
-VIEW = 2
-SEARCH = 3
-DELETE = 4
-DONE = 5
+INSERT        = 1
+VIEW          = 2
+SEARCH        = 3
+DELETE        = 4
+DONE          = 5
 LIST_CATEGORY = 6
-LIST_DONE = 7
-UNDONE = 8
-EXIT = 9
+LIST_DONE     = 7
+UNDONE        = 8
+EXIT          = 9
+
 require_relative 'study_item'
 require 'colorize'
 

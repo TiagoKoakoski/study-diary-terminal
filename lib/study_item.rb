@@ -11,23 +11,6 @@ class StudyItem
     @done = done
   end
 
-  def self.select_category()
-    puts "Qual a categoria:
-    1 - Ruby
-    2 - Rails
-    3 - HTML"
-    print "Categoria: ".yellow
-    category = gets.to_i()
-    if category == 1
-      category = "Ruby"
-    elsif category == 2
-      category = "Rails"
-    elsif category == 3
-      category = "HTML"
-    end
-    category
-  end
-
   def self.all
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
@@ -37,7 +20,7 @@ class StudyItem
   end
 
   def self.print_list(items)
-    items.each_with_index {|valor, ind| puts "[#{ind+1}] - #{valor.title} - #{valor.description} - Categoria: #{valor.category} #{' - Concluído' if valor.done == 1}"}
+    items.each_with_index {|element, ind| puts "[#{ind+1}] - #{element.title} - #{element.description} - Categoria: #{element.category} #{' - Concluído' if element.done == 1}"}
   end
 
   def save_to_db
@@ -47,14 +30,14 @@ class StudyItem
     self
   end
 
-  def self.search_item()
+  def self.search_item
     print "Qual item deseja encontrar: ".yellow
     search = gets.chomp.downcase
     study_list = self.all
     puts "Itens encontrados: "
-    study_list.each do |valor|
-      if ( valor.title.downcase.include? search ) || ( valor.description.downcase.include? search )
-        puts " - #{valor.title} - #{valor.description} - Categoria #{valor.category}"
+    study_list.each do |element|
+      if ( element.title.downcase.include? search ) || ( element.description.downcase.include? search )
+        puts " - #{element.title} - #{element.description} - Categoria #{element.category}"
       end
     end
   end
@@ -62,18 +45,18 @@ class StudyItem
   def self.create_study_item
     print "Digite o item para estudo: ".yellow
     item = gets.chomp()
-    category = self.select_category()
+    category = Category.select_category
     print "Digite a descrição do item para estudo: ".yellow
     description = gets.chomp()
-    study_item = StudyItem.new(title: item, category: category, description: description)
+    study_item = new(title: item, category: category, description: description)
     study_item.save_to_db
     option = 0
     puts "Item #{item} cadastrado com sucesso na categoria #{category}"
   end
 
-  def self.find_by_category()
+  def self.find_by_category
     system "clear"
-    category = select_category()
+    category = Category.select_category
     puts "Os itens na categoria #{category} são: "
     db = SQLite3::Database.open "db/database.db"
     db.results_as_hash = true
@@ -82,7 +65,7 @@ class StudyItem
     self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description'], done: item['done']) })
   end
 
-  def self.find_undone()
+  def self.find_undone
     system "clear"
     puts "Os itens não concluídos são: "
     db = SQLite3::Database.open "db/database.db"
@@ -92,7 +75,7 @@ class StudyItem
     self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) })
   end
 
-  def self.find_done()
+  def self.find_done
     system "clear"
     puts "Os itens concluídos são: "
     db = SQLite3::Database.open "db/database.db"
@@ -102,7 +85,7 @@ class StudyItem
     self.print_list(items.map {|item| new(title: item['title'], category: item['category'], description: item['description']) })
   end
 
-  def self.delete()
+  def self.delete
     list = self.all()
     print "Qual o item que deseja remover: ".yellow
     select = gets.chomp
@@ -115,7 +98,7 @@ class StudyItem
     puts "item removido com sucesso"
   end
 
-  def self.done()
+  def self.done
     list = find_undone()
     print "Qual o item que deseja concluir: ".yellow
     select = gets.chomp
@@ -128,7 +111,7 @@ class StudyItem
     puts "item concluído com sucesso"
   end
 
-  def self.undone()
+  def self.undone
     list = find_done()
     print "Qual o item que deseja voltar a estudar: ".yellow
     select = gets.chomp
