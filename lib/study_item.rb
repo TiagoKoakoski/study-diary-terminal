@@ -40,11 +40,11 @@ class StudyItem
     search = gets.chomp.downcase
     study_list = self.all
     puts "Itens encontrados: "
-    study_list.each do |element|
-      if ( element.title.downcase.include? search ) || ( element.description.downcase.include? search )
-        puts " - #{element.title} - #{element.description} - Categoria #{element.category}"
-      end
-    end
+    db = SQLite3::Database.open "db/database.db"
+    db.results_as_hash = true
+    items = db.execute "SELECT title, category, description, done FROM diario WHERE title LIKE '%#{search}%' OR description LIKE '%#{search}%'"
+    db.close
+    print_list(create_from_db(items))
   end
 
   def self.create_study_item
